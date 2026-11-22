@@ -1,0 +1,598 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Petualangan Bahasa Bubo</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito:wght@500;700;800&display=swap">
+<style>
+/* Layout: kartu soal besar di kanan, Bubo si burung hantu di kiri; 6 "pulau" = 6 bagian soal */
+:root{
+  --bg:#EAF5FF; --surface:#FFFFFF; --ink:#1F2A44; --muted:#56638A; --line:#D3E3F6;
+  --primary:#3D5AFE; --primary-ink:#FFFFFF; --sun:#FFC83D; --coral:#FF6B6B; --mint:#1FBF8B; --sky:#38BDF8; --grape:#8B5CF6;
+  --chip:#EEF3FF; --ok-bg:#E2F8EE; --ok-line:#1FBF8B; --ok-ink:#0B6B4B; --no-bg:#FFF0DC; --no-line:#FFA94D; --no-ink:#8A4B08;
+  --blob1:#CDE6FF; --blob2:#FFE8B5; --paper:#FFFBEA; --paper-line:#F2E3A5;
+  --owl:#5B7CFA; --owl-wing:#3F5BD8; --owl-belly:#E9EEFF;
+  --shadow:0 10px 30px rgba(40,70,140,.14);
+  --f-display:"Baloo 2","Trebuchet MS",system-ui,sans-serif; --f-body:"Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#111936; --surface:#1B2650; --ink:#EEF2FF; --muted:#AEBBE0; --line:#2E3C70;
+  --primary:#8EA2FF; --primary-ink:#0E1630; --sun:#FFD25E; --coral:#FF8585; --mint:#3DDCA6; --sky:#5CCBFA; --grape:#A78BFA;
+  --chip:#26346A; --ok-bg:#12382F; --ok-line:#3DDCA6; --ok-ink:#BFF5DF; --no-bg:#40301A; --no-line:#FFB35C; --no-ink:#FFE0B8;
+  --blob1:#1C2C63; --blob2:#3A2E3F; --paper:#2A2E55; --paper-line:#44497D;
+  --owl:#7B95FF; --owl-wing:#5A74E8; --owl-belly:#E9EEFF;
+  --shadow:0 10px 30px rgba(0,0,0,.35); color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --bg:#111936; --surface:#1B2650; --ink:#EEF2FF; --muted:#AEBBE0; --line:#2E3C70;
+  --primary:#8EA2FF; --primary-ink:#0E1630; --sun:#FFD25E; --coral:#FF8585; --mint:#3DDCA6; --sky:#5CCBFA; --grape:#A78BFA;
+  --chip:#26346A; --ok-bg:#12382F; --ok-line:#3DDCA6; --ok-ink:#BFF5DF; --no-bg:#40301A; --no-line:#FFB35C; --no-ink:#FFE0B8;
+  --blob1:#1C2C63; --blob2:#3A2E3F; --paper:#2A2E55; --paper-line:#44497D;
+  --owl:#7B95FF; --owl-wing:#5A74E8; --owl-belly:#E9EEFF;
+  --shadow:0 10px 30px rgba(0,0,0,.35); color-scheme:dark;}
+
+*{box-sizing:border-box}
+html,body{min-height:100%}
+body{
+  background:var(--bg);
+  background-image:radial-gradient(520px 340px at 8% 0%,var(--blob1),transparent 70%),radial-gradient(480px 320px at 100% 18%,var(--blob2),transparent 70%);
+  background-repeat:no-repeat; background-attachment:fixed;
+  color:var(--ink); font-family:var(--f-body); font-size:17px; line-height:1.55;
+  padding-block:0 28px;
+  padding-left:max(16px,env(safe-area-inset-left,0px)); padding-right:max(16px,env(safe-area-inset-right,0px));
+}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bg)}
+h1,h2,h3{font-family:var(--f-display);line-height:1.15;margin:0;text-wrap:balance}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--primary);outline-offset:2px}
+.app{max-width:980px;margin:0 auto}
+
+/* header */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);padding:10px 0 8px}
+.toprow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.brand{font-family:var(--f-display);font-weight:800;font-size:1.15rem;flex:1;min-width:0}
+.pill{border:2px solid var(--line);background:var(--surface);border-radius:999px;padding:4px 12px;font-weight:800;white-space:nowrap}
+.pill.btn-sound{display:inline-flex;gap:6px;align-items:center}
+.bar{height:12px;border-radius:99px;background:var(--chip);margin-top:8px;overflow:hidden}
+.bar>i{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,var(--sky),var(--mint),var(--sun));transition:width .6s cubic-bezier(.3,1.4,.5,1)}
+.isles{display:flex;gap:6px;margin-top:8px;overflow-x:auto;padding-bottom:2px}
+.isle{flex:1 0 auto;min-width:0;display:flex;align-items:center;gap:6px;font-size:.78rem;font-weight:800;color:var(--muted);background:var(--chip);border-radius:12px;padding:4px 10px;white-space:nowrap}
+.isle b{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--surface);color:var(--ink);font-size:.78rem}
+.isle.cur{background:var(--primary);color:var(--primary-ink)}
+.isle.cur b{background:var(--sun);color:#1F2A44}
+.isle.done{background:var(--ok-bg);color:var(--ok-ink)}
+.isle.done b{background:var(--mint);color:#fff}
+
+/* hero */
+.hero{position:relative;display:grid;grid-template-columns:minmax(180px,260px) 1fr;gap:28px;align-items:center;margin-top:26px;background:var(--surface);border:2px solid var(--line);border-radius:32px;padding:30px;box-shadow:var(--shadow);overflow:hidden}
+.hero-text{min-width:0;position:relative;z-index:1}
+.hero h1{font-size:clamp(2rem,6vw,3.1rem);font-weight:800;margin:6px 0 10px}
+.hero h1 span{color:var(--primary)}
+.eyebrow{display:inline-block;font-weight:800;font-size:.85rem;letter-spacing:.06em;text-transform:uppercase;color:var(--grape);background:var(--chip);padding:3px 12px;border-radius:99px;margin:0}
+.hero label{display:block;font-weight:800;margin:18px 0 6px}
+.hero input{width:100%;max-width:380px;font:inherit;font-weight:700;padding:13px 16px;border-radius:16px;border:2px solid var(--line);background:var(--bg);color:var(--ink)}
+.small{font-size:.9rem;color:var(--muted);margin:12px 0 0}
+.hero-owl{display:grid;place-items:center;position:relative;z-index:1}
+.deco{position:absolute;border-radius:50%;opacity:.55;animation:float 7s ease-in-out infinite}
+.deco.d1{width:110px;height:110px;background:var(--blob2);right:-30px;top:-30px}
+.deco.d2{width:70px;height:70px;background:var(--blob1);left:40%;bottom:-24px;animation-delay:-3s}
+.deco.d3{width:36px;height:36px;background:var(--sun);right:18%;top:22px;animation-delay:-1.5s}
+@keyframes float{50%{transform:translateY(-12px)}}
+
+.btn{border:0;border-radius:18px;background:var(--primary);color:var(--primary-ink);font-family:var(--f-display);font-weight:800;font-size:1.1rem;padding:12px 22px;box-shadow:0 5px 0 rgba(20,30,90,.28);transition:transform .15s,box-shadow .15s}
+.btn:hover{transform:translateY(-2px)}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(20,30,90,.28)}
+.btn.big{font-size:1.3rem;padding:14px 28px;margin-top:6px;background:var(--coral);color:#fff}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.btn.alt{background:var(--chip);color:var(--ink);box-shadow:0 4px 0 var(--line)}
+.ghost{border:2px solid var(--line);background:var(--surface);border-radius:12px;padding:4px 12px;font-weight:800;font-size:.9rem}
+.ghost:hover{background:var(--chip)}
+
+/* stage */
+.stage{display:grid;grid-template-columns:150px minmax(0,1fr);gap:22px;margin-top:14px;align-items:start}
+.buddy{position:sticky;top:calc(env(safe-area-inset-top,0px) + 130px);display:flex;flex-direction:column;align-items:center;gap:8px}
+.bubble{position:relative;background:var(--surface);border:2px solid var(--line);border-radius:18px;padding:8px 12px;font-size:.88rem;font-weight:700;text-align:center;line-height:1.35;box-shadow:var(--shadow)}
+.bubble::before{content:"";position:absolute;top:-9px;left:50%;margin-left:-8px;width:14px;height:14px;background:var(--surface);border-left:2px solid var(--line);border-top:2px solid var(--line);transform:rotate(45deg)}
+.owl{width:132px;height:auto;overflow:visible;display:block}
+.owl .eye-happy,.owl .brow,.owl .spark{display:none}
+.owl.happy .eye-happy,.owl.happy .spark{display:block}
+.owl.happy .pupil{display:none}
+.owl.cheer .brow{display:block}
+.owl.cheer .pupil{transform:translateY(-2px)}
+.owl .eyes{transform-origin:70px 64px;animation:blink 4.8s infinite}
+@keyframes blink{0%,94%,100%{transform:scaleY(1)}97%{transform:scaleY(.1)}}
+.owl-body{transform-origin:70px 135px;animation:bob 3.2s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-5px)}}
+.owl.hop .owl-body{animation:hop .7s ease-out 2}
+@keyframes hop{0%,100%{transform:translateY(0) scale(1,1)}30%{transform:translateY(-22px) scale(.96,1.05)}55%{transform:translateY(0) scale(1.05,.94)}}
+.owl.wobble .owl-body{animation:wob .8s ease-in-out 1}
+@keyframes wob{25%{transform:rotate(-5deg)}50%{transform:rotate(5deg)}75%{transform:rotate(-3deg)}}
+.owl .wing-r{transform-origin:108px 80px}
+.owl.hop .wing-r,.owl.cheer .wing-r{animation:wave .5s ease-in-out 4}
+@keyframes wave{50%{transform:rotate(-24deg)}}
+
+.card{background:var(--surface);border:2px solid var(--line);border-radius:28px;padding:22px;box-shadow:var(--shadow);min-width:0;animation:pop .45s cubic-bezier(.3,1.5,.5,1)}
+@keyframes pop{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
+.qhead{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.chip{font-weight:800;font-size:.82rem;background:var(--chip);padding:3px 12px;border-radius:99px}
+.chip.sec{background:var(--primary);color:var(--primary-ink)}
+.qhead .ghost{margin-left:auto}
+.qwrap{display:flex;gap:14px;align-items:flex-start}
+.sticker{flex:0 0 auto;display:grid;place-items:center;width:64px;height:64px;border-radius:20px;background:linear-gradient(145deg,var(--blob2),var(--blob1));font-size:2rem;line-height:1;animation:wig 3s ease-in-out infinite}
+@keyframes wig{50%{transform:rotate(-6deg) scale(1.06)}}
+.qtext{font-size:clamp(1.15rem,3.4vw,1.45rem);font-weight:800;min-width:0;overflow-wrap:anywhere}
+.pass{margin:14px 0 4px;padding:14px 16px;background:var(--paper);border:2px dashed var(--paper-line);border-radius:18px;white-space:pre-line;overflow-wrap:anywhere}
+.pass b{color:var(--coral);font-size:1.12em}
+#answer{margin-top:16px;display:grid;gap:10px}
+.opt{display:flex;gap:12px;align-items:center;width:100%;text-align:left;padding:12px 14px;min-height:56px;border:2px solid var(--line);border-radius:18px;background:var(--surface);transition:transform .15s,border-color .15s,background .15s}
+.opt:hover:not(:disabled){transform:translateY(-2px);border-color:var(--primary)}
+.opt .key{flex:0 0 auto;display:grid;place-items:center;width:36px;height:36px;border-radius:12px;background:var(--chip);font-family:var(--f-display);font-weight:800}
+.opt .txt{min-width:0;overflow-wrap:anywhere;font-weight:700}
+.opt[aria-pressed="true"]{border-color:var(--primary);background:var(--chip)}
+.opt[aria-pressed="true"] .key{background:var(--primary);color:var(--primary-ink)}
+.opt.correct{border-color:var(--ok-line);background:var(--ok-bg);animation:yay .6s}
+.opt.correct .key{background:var(--mint);color:#fff}
+.opt.wrong{border-color:var(--no-line);background:var(--no-bg);animation:soft .6s}
+.opt.wrong .key{background:var(--no-line);color:#3a2300}
+.opt:disabled{cursor:default}
+.opt.dim{opacity:.6}
+@keyframes yay{40%{transform:scale(1.03)}}
+@keyframes soft{25%{transform:translateX(-5px)}50%{transform:translateX(5px)}75%{transform:translateX(-2px)}}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.bs{justify-content:center;font-family:var(--f-display);font-weight:800;font-size:1.3rem;min-height:70px;text-align:center}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.counter{font-weight:800;color:var(--muted);font-size:.9rem}
+.field{display:grid;gap:6px}
+.field label{font-weight:800;font-size:.92rem;color:var(--muted)}
+.field input,.field textarea{width:100%;font:inherit;font-weight:700;padding:13px 16px;border-radius:16px;border:2px solid var(--line);background:var(--bg);color:var(--ink);resize:vertical}
+.field input:disabled,.field textarea:disabled{opacity:.8}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.hint{font-weight:800;color:var(--grape);min-height:1.2em}
+.model{background:var(--ok-bg);border:2px solid var(--ok-line);color:var(--ok-ink);border-radius:18px;padding:14px 16px;animation:pop .4s}
+.model p{margin:0 0 8px}
+.model ul{margin:6px 0 0;padding-left:20px}
+.fb{margin-top:16px;border-radius:20px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start;animation:slide .45s cubic-bezier(.3,1.4,.5,1)}
+.fb.ok{background:var(--ok-bg);border:2px solid var(--ok-line);color:var(--ok-ink)}
+.fb.no{background:var(--no-bg);border:2px solid var(--no-line);color:var(--no-ink)}
+.fb .em{font-size:2rem;line-height:1}
+.fb h3{font-size:1.2rem;font-weight:800;margin-bottom:4px}
+.fb p{margin:4px 0 0;overflow-wrap:anywhere}
+.fb .next{margin-top:12px}
+@keyframes slide{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.plus{position:absolute;pointer-events:none;font-family:var(--f-display);font-weight:800;color:var(--mint);animation:rise 1s forwards}
+@keyframes rise{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-34px)}}
+
+/* intro + result */
+.panel{margin:22px auto 0;max-width:640px;background:var(--surface);border:2px solid var(--line);border-radius:32px;padding:30px;text-align:center;box-shadow:var(--shadow);animation:pop .5s cubic-bezier(.3,1.5,.5,1)}
+.panel .big{font-size:4.2rem;line-height:1;animation:float 3s ease-in-out infinite}
+.panel h2{font-size:clamp(1.6rem,5vw,2.2rem);font-weight:800;margin:10px 0 8px}
+.panel p{margin:0 0 16px}
+.stars{display:flex;justify-content:center;gap:8px;font-size:3rem;line-height:1;margin:10px 0}
+.stars span{display:inline-block;filter:grayscale(1);opacity:.35}
+.stars span.on{filter:none;opacity:1;animation:starin .7s cubic-bezier(.3,1.8,.5,1) backwards}
+@keyframes starin{from{transform:scale(0) rotate(-90deg)}}
+.score{font-family:var(--f-display);font-weight:800;font-size:4rem;color:var(--primary);line-height:1}
+.sumtable{width:100%;border-collapse:collapse;margin:12px 0;text-align:left;font-size:.95rem}
+.sumtable td{padding:8px 6px;border-bottom:2px solid var(--line)}
+.sumtable td:last-child{text-align:right;font-weight:800;white-space:nowrap}
+.review{text-align:left;margin:10px 0 18px;display:grid;gap:8px;max-height:340px;overflow:auto}
+.review div{background:var(--chip);border-radius:14px;padding:8px 12px;font-size:.92rem;overflow-wrap:anywhere}
+.review b{color:var(--primary)}
+.tabwrap{overflow-x:auto}
+#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:40}
+.note{font-size:.88rem;color:var(--muted);margin-top:14px;text-align:center}
+
+@media (max-width:700px){
+  body{font-size:16px}
+  .hero{grid-template-columns:1fr;padding:22px 18px;gap:6px;text-align:center}
+  .hero input{max-width:none}
+  .owl{width:104px}
+  .stage{grid-template-columns:1fr;gap:12px}
+  .buddy{position:static;flex-direction:row;align-items:center;gap:10px}
+  .bubble{flex:1;text-align:left}
+  .bubble::before{top:50%;left:-9px;margin:-7px 0 0;transform:rotate(-45deg)}
+  .card{padding:16px;border-radius:22px}
+  .sticker{width:52px;height:52px;font-size:1.6rem;border-radius:16px}
+  .grid2{grid-template-columns:1fr}
+  .brand{flex-basis:100%}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+</style>
+
+<div class="app">
+  <header class="top" id="top" hidden>
+    <div class="toprow">
+      <div class="brand" id="brand">Petualangan Bahasa Bubo</div>
+      <span class="pill" id="scorechip" aria-live="polite">⭐ 0</span>
+      <button class="pill btn-sound" id="snd" aria-pressed="true" title="Suara hidup atau mati">🔊 Suara</button>
+    </div>
+    <div class="bar" role="progressbar" aria-label="Kemajuan"><i id="barfill"></i></div>
+    <div class="isles" id="isles"></div>
+  </header>
+  <main id="main"></main>
+</div>
+<canvas id="fx" aria-hidden="true"></canvas>
+
+<script>
+(function(){
+'use strict';
+var $=function(s){return document.querySelector(s)};
+var esc=function(t){return String(t).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})};
+var fmt=function(t){return esc(t).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>')};
+var L='ABCDEF';
+var RM=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+var pick=function(a){return a[Math.floor(Math.random()*a.length)]};
+var norm=function(s){return String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim()};
+
+var TERMS=['Kamus','Buku nonfiksi','Penata letak (layouter)','Amanat','Buku fiksi','Tema'];
+var SECS=[
+ {id:'A',name:'Pulau Pilihan Ganda',emoji:'🏝️',from:1,to:20,max:20,type:'Pilihan Ganda',intro:'Di pulau ini ada 20 soal. Pilih satu jawaban yang paling tepat, ya!'},
+ {id:'B',name:'Pulau Benar–Salah',emoji:'🌴',from:21,to:25,max:5,type:'Benar atau Salah',intro:'Baca cerita pendeknya, lalu tentukan: pernyataannya benar atau salah?'},
+ {id:'C',name:'Pulau Jodoh',emoji:'🏖️',from:26,to:30,max:5,type:'Jodohkan',intro:'Jodohkan pengertian dengan istilah yang cocok. Ada satu istilah pengecoh, lho!'},
+ {id:'D',name:'Pulau Pilih Beberapa',emoji:'🌋',from:31,to:35,max:10,type:'Pilih Beberapa Jawaban',intro:'Kali ini jawabannya lebih dari satu. Perhatikan berapa jawaban yang diminta.'},
+ {id:'E',name:'Pulau Isian',emoji:'🗻',from:36,to:45,max:20,type:'Isian Singkat',intro:'Ketik jawabanmu sendiri. Pakai huruf kecil atau besar boleh, kok!'},
+ {id:'F',name:'Pulau Cerita Panjang',emoji:'🏰',from:46,to:50,max:40,type:'Uraian',intro:'Pulau terakhir! Tulis jawabanmu dengan kalimat lengkap, lalu bandingkan dengan contoh dari Bubo.'}
+];
+
+var Q=[
+{n:1,sec:'A',t:'pg',img:'📚',pass:"**B**acalah buku setiap hari\n**U**ntuk menambah ilmu pengetahuan\n**K**ita menjadi pintar dan berwawasan\n**U** ……………………………",q:"Perhatikan puisi akrostik di atas. Baris terakhir yang paling sesuai dengan tema dan huruf awal puisi adalah ...",o:["Ukirlah masa depan dengan rajin membaca","Belajarlah dengan sungguh-sungguh","Udang hidup di dalam laut","Kita bermain sepanjang hari"],a:0,ex:"Baris terakhir harus diawali huruf U dan bertema buku atau membaca. Hanya pilihan A yang memenuhi keduanya."},
+{n:2,sec:'A',t:'pg',img:'🔎',pass:"Ayah mengamati proses metamorfosis kupu-kupu di kebun.",q:"Dina belum tahu arti kata “metamorfosis”. Langkah yang tepat untuk menemukan maknanya di kamus adalah ...",o:["Membuka kamus secara acak sampai kata itu ketemu","Mencari kata berdasarkan urutan abjad, lalu membaca artinya","Mencari kata dimulai dari huruf terakhirnya","Membaca seluruh isi kamus dari halaman pertama"],a:1,ex:"Kata di kamus disusun menurut abjad, jadi kita cari dari huruf pertama, kedua, dan seterusnya."},
+{n:3,sec:'A',t:'pg',img:'🍞',pass:"Sarapan penting bagi anak sekolah. Dengan sarapan, tubuh memiliki tenaga untuk belajar. Anak yang sarapan lebih mudah berkonsentrasi di kelas. Sarapan juga membuat kita tidak mudah lemas.",q:"Gagasan utama paragraf di atas adalah ...",o:["Anak sekolah harus belajar dengan giat","Sarapan membuat tubuh menjadi lemas","Sarapan penting bagi anak sekolah","Anak sekolah sebaiknya makan malam lebih awal"],a:2,ex:"Semua kalimat membahas manfaat sarapan bagi anak sekolah."},
+{n:4,sec:'A',t:'pg',img:'🤝',pass:"Siswa kelas V akan kerja bakti membersihkan halaman sekolah. Sebagian siswa menyapu sendirian, sedangkan sebagian lainnya hanya mengobrol sehingga pekerjaan tidak kunjung selesai.",q:"Tindakan yang paling tepat agar kegiatan berjalan dengan baik adalah ...",o:["menunggu guru membersihkan halaman sendiri","membiarkan siswa yang menyapu menyelesaikan semuanya","mengerjakan bagian masing-masing tanpa saling membantu","membagi tugas, lalu mengerjakannya bersama-sama sesuai kesepakatan"],a:3,ex:"Kerja sama berarti berbagi tugas dan mengerjakannya bersama-sama."},
+{n:5,sec:'A',t:'pg',img:'🧵',q:"Bu Rina bekerja menjahit pakaian setiap hari. Orang yang pekerjaannya menjahit pakaian disebut ...",o:["penjahit","dijahit","menjahit","jahitan"],a:0,ex:"Imbuhan pe- membentuk kata yang menunjukkan orang pelaku kegiatan: pe- + jahit = penjahit."},
+{n:6,sec:'A',t:'pg',img:'🌅',q:"Pemandangan di pantai itu sangat indah. Persamaan makna (sinonim) kata “indah” adalah ...",o:["buruk","elok","kotor","gelap"],a:1,ex:"Elok bermakna sama dengan indah."},
+{n:7,sec:'A',t:'pg',img:'🧩',pass:"(1) Rina menyapu halaman.\n(2) Dina menyiram bunga.",q:"Kedua kalimat di atas jika digabung menjadi kalimat majemuk setara yang tepat adalah ...",o:["Rina menyapu halaman karena Dina menyiram bunga.","Rina menyapu halaman jika Dina menyiram bunga.","Rina menyapu halaman dan Dina menyiram bunga.","Rina menyapu halaman sehingga Dina menyiram bunga."],a:2,ex:"Dua kegiatan yang sejajar digabung dengan kata penghubung “dan”."},
+{n:8,sec:'A',t:'pg',img:'🎨',pass:"Dika sedang berlatih menggambar untuk mengikuti lomba. Ibu menyemangatinya setiap sore. Rani, adiknya, sering menemaninya berlatih. Pak Guru memberi saran agar gambar Dika semakin bagus. Meskipun gambarnya sering salah, Dika tidak pernah menyerah.",q:"Tokoh utama dalam cerita tersebut adalah ...",o:["Ibu","Rani","Pak Guru","Dika"],a:3,ex:"Cerita paling banyak membahas Dika dan usahanya, jadi Dika adalah tokoh utama."},
+{n:9,sec:'A',t:'pg',img:'🚲',pass:"Dodo melihat temannya terjatuh dari sepeda. Ia segera berlari menolong, membersihkan luka temannya dengan hati-hati, lalu mengantarnya pulang.",q:"Berdasarkan tindakan Dodo, watak Dodo adalah ...",o:["peduli dan suka menolong","acuh tak acuh","malas dan lamban","sombong"],a:0,ex:"Dodo berlari menolong, merawat luka, lalu mengantar temannya. Itu tanda peduli."},
+{n:10,sec:'A',t:'pg',img:'🪐',pass:"Bab 1  Mengenal Tata Surya\nBab 2  Matahari sebagai Pusat Tata Surya\nBab 3  Planet-Planet di Tata Surya\nBab 4  Bulan dan Satelit Lain",q:"Berdasarkan daftar isi di atas, buku tersebut termasuk jenis ...",o:["buku fiksi","buku nonfiksi","buku dongeng","buku cerita bergambar"],a:1,ex:"Isinya pengetahuan dan fakta tentang tata surya, jadi termasuk buku nonfiksi."},
+{n:11,sec:'A',t:'pg',img:'🥬',pass:"Sore itu, Dewi membantu Nenek memetik sayuran di kebun belakang rumah. Udara terasa sejuk dan burung-burung berkicau riang.",q:"Latar tempat terjadinya peristiwa dalam kutipan tersebut adalah ...",o:["sekolah","pasar","kebun belakang rumah","perpustakaan"],a:2,ex:"Peristiwa memetik sayuran terjadi di kebun belakang rumah."},
+{n:12,sec:'A',t:'pg',img:'📝',q:"Langkah awal yang dilakukan sebelum menulis sebuah teks adalah ...",o:["menyunting tulisan","menerbitkan tulisan","membaca ulang tulisan","menentukan topik atau gagasan yang akan ditulis"],a:3,ex:"Sebelum menulis, tentukan dulu topik atau gagasan yang akan ditulis."},
+{n:13,sec:'A',t:'pg',img:'🌊',pass:"Ombak berkejar-kejaran di tepi pantai.",q:"Majas yang digunakan dalam kalimat tersebut adalah ...",o:["personifikasi","hiperbola","metafora","perumpamaan"],a:0,ex:"Ombak digambarkan seperti makhluk hidup yang berkejar-kejaran. Itulah personifikasi."},
+{n:14,sec:'A',t:'pg',img:'💬',q:"Kalimat langsung yang tepat terdapat pada pilihan ...",o:["Ibu berkata bahwa ia meminta Kakak membantu membawa belanjaan.","Ibu berkata, “Bantu Ibu membawa belanjaan, Kak.”","Ibu meminta Kakak untuk membantu membawa belanjaan.","Kakak diminta Ibu untuk membantu membawa belanjaan."],a:1,ex:"Kalimat langsung memuat ucapan asli yang diapit tanda petik."},
+{n:15,sec:'A',t:'pg',img:'🛠️',q:"Kata “mengukir” berasal dari kata dasar “ukir” yang mendapat imbuhan meng-. Makna imbuhan meng- pada kata tersebut adalah ...",o:["menyatakan orang yang melakukan pekerjaan","menyatakan hasil dari suatu pekerjaan","melakukan perbuatan seperti yang disebutkan pada kata dasar","menyatakan tempat melakukan suatu pekerjaan"],a:2,ex:"Imbuhan meng- pada “mengukir” bermakna melakukan perbuatan ukir."},
+{n:16,sec:'A',t:'pg',img:'🏸',pass:"Raka suka bermain bulu tangkis. Ia berlatih tiga kali dalam seminggu. Awalnya pukulan Raka sering gagal. Setelah berlatih secara rutin, pukulannya menjadi semakin kuat dan tepat. Kini Raka terpilih mewakili sekolah dalam sebuah lomba.",q:"Kesimpulan manfaat latihan yang tepat berdasarkan teks tersebut adalah ...",o:["Hobi hanya bermanfaat untuk mengisi waktu luang","Lomba dapat diikuti tanpa perlu berlatih","Kemampuan bawaan tidak bisa ditingkatkan","Latihan yang rutin dapat mengembangkan kemampuan"],a:3,ex:"Latihan rutin membuat pukulan Raka makin kuat dan tepat, jadi kemampuan bisa berkembang."},
+{n:17,sec:'A',t:'pg',img:'📋',q:"Langkah pertama yang dilakukan sebelum menyusun teks prosedur adalah ...",o:["menentukan topik atau tujuan teks","menulis langkah paling akhir","memeriksa ejaan tulisan","menyalin teks dari buku"],a:0,ex:"Sebelum menyusun teks prosedur, tentukan dulu topik atau tujuannya."},
+{n:18,sec:'A',t:'pg',img:'🍹',pass:"Cara membuat es jeruk:\n1. Siapkan jeruk, gula, es batu, dan air.\n2. Peras jeruk ke dalam gelas.\n3. Tambahkan gula dan air, lalu aduk hingga rata.\n4. ……………………………",q:"Langkah selanjutnya yang tepat adalah ...",o:["Peras jeruk ke dalam gelas.","Tambahkan es batu, lalu es jeruk siap disajikan.","Siapkan jeruk, gula, dan es batu.","Cuci gelas setelah es jeruk diminum."],a:1,ex:"Setelah diaduk, es batu ditambahkan, lalu es jeruk siap disajikan."},
+{n:19,sec:'A',t:'pg',img:'🌹',pass:"(1) Setelah beberapa minggu, tanaman itu mulai tumbuh dan berbunga.\n(2) Hobi saya adalah berkebun.\n(3) Setiap sore saya menyiramnya dan mencabut rumput di sekitarnya.\n(4) Saya menanam bunga mawar di pot di halaman rumah.\n(5) Melihat bunga mekar membuat saya sangat senang.",q:"Urutan kalimat yang tepat agar menjadi paragraf yang runtut adalah ...",o:["(4) – (2) – (1) – (3) – (5)","(2) – (3) – (4) – (5) – (1)","(2) – (4) – (3) – (1) – (5)","(1) – (2) – (3) – (4) – (5)"],a:2,ex:"Mulai dari hobi (2), menanam (4), merawat (3), hasilnya (1), lalu perasaan (5)."},
+{n:20,sec:'A',t:'pg',img:'⛵',pass:"Dito menulis teks prosedur cara membuat kapal kertas. Ia meminta temannya mencoba mengikuti petunjuk itu tanpa bantuan.",q:"Tujuan Dito meminta temannya mencoba petunjuk tersebut adalah ...",o:["agar temannya mendapat nilai bagus","agar kapal kertas yang dibuat lebih banyak","agar tulisannya menjadi lebih panjang","mengetahui apakah langkah-langkahnya mudah dipahami dan dapat diikuti"],a:3,ex:"Mencoba petunjuk membantu kita tahu apakah langkah-langkahnya jelas dan bisa diikuti."},
+
+{n:21,sec:'B',t:'bs',img:'✏️',pass:"Tono selalu meminjamkan alat tulisnya kepada teman yang lupa membawa. Ia melakukannya dengan senang hati dan tidak meminta imbalan.",q:"Berdasarkan tindakan tersebut, Tono memiliki sifat dermawan dan suka menolong.",a:true,ex:"Tono memberi pinjaman dengan senang hati tanpa imbalan. Itu tanda dermawan dan suka menolong."},
+{n:22,sec:'B',t:'bs',img:'⏰',pass:"Lina sering mengerjakan tugas pada menit-menit terakhir dan beberapa kali lupa membawa buku pelajaran.",q:"Sifat Lina yang sesuai dengan perilaku tersebut adalah disiplin dan bertanggung jawab.",a:false,ex:"Mengerjakan tugas di menit terakhir dan sering lupa membawa buku belum menunjukkan disiplin dan tanggung jawab."},
+{n:23,sec:'B',t:'bs',img:'🏺',pass:"Ayu memecahkan vas bunga di rumah, lalu ia mengakui kesalahannya kepada Ibu. Raka memecahkan gelas, lalu ia berbohong dengan menyalahkan adiknya.",q:"Jika dibandingkan berdasarkan nilai kejujuran, perilaku Ayu lebih baik daripada perilaku Raka.",a:true,ex:"Ayu berani mengakui kesalahan, sedangkan Raka berbohong. Ayu lebih jujur."},
+{n:24,sec:'B',t:'bs',img:'💃',pass:"Nadia gemar menari. Ibu mendaftarkannya di sanggar tari, dan Kak Wulan, pelatihnya, melatih Nadia dengan sabar. Nadia berlatih setiap hari hingga menjuarai lomba menari tingkat kabupaten.",q:"Prestasi Nadia diraih tanpa ada hubungannya dengan dukungan Ibu dan pelatihnya.",a:false,ex:"Prestasi Nadia berkaitan dengan dukungan Ibu, bimbingan pelatih, dan latihan setiap hari."},
+{n:25,sec:'B',t:'bs',img:'🖍️',pass:"Mira menunjukkan gambarnya kepada teman-teman, dan seorang teman berkomentar bahwa gambar itu kurang rapi.",q:"Sikap yang tepat bagi Mira adalah menjadikan komentar tersebut sebagai bahan belajar dan terus berlatih menggambar.",a:true,ex:"Sikap pantang menyerah berarti belajar dari komentar dan terus berlatih."},
+
+{n:26,sec:'C',t:'jod',img:'🧑‍🎨',q:"Orang yang bertugas mendesain atau menata tampilan halaman dan sampul buku disebut ...",a:2,ex:"Penata letak (layouter) bertugas menata tampilan halaman dan sampul buku."},
+{n:27,sec:'C',t:'jod',img:'🦄',q:"Buku yang berisi cerita khayalan atau rekaan pengarang disebut ...",a:4,ex:"Cerita khayalan termasuk buku fiksi."},
+{n:28,sec:'C',t:'jod',img:'🔤',q:"Buku yang berisi kumpulan kata beserta maknanya yang disusun menurut abjad disebut ...",a:0,ex:"Kumpulan kata beserta maknanya ada di kamus."},
+{n:29,sec:'C',t:'jod',img:'🔬',q:"Buku yang berisi informasi berdasarkan fakta atau kenyataan disebut ...",a:1,ex:"Buku berisi fakta dan pengetahuan adalah buku nonfiksi."},
+{n:30,sec:'C',t:'jod',img:'💌',q:"Pesan yang ingin disampaikan pengarang kepada pembaca melalui sebuah cerita disebut ...",a:3,ex:"Pesan dari pengarang untuk pembaca adalah amanat."},
+
+{n:31,sec:'D',t:'pgk',img:'🌊',pick:3,pass:"**Pesan dari Sungai**\nPagi itu, Bima dan Adit pergi ke tepi sungai di desa mereka. Mereka melihat banyak sampah mengapung di air. “Sungai ini harus dibersihkan,” kata Bima. Adit awalnya malas, tetapi akhirnya ia ikut memunguti sampah. Menjelang siang, sungai kembali jernih dan warga desa memuji mereka. Bima dan Adit pulang dengan senang. Mereka sadar bahwa menjaga kebersihan lingkungan adalah tugas semua orang.",q:"Pernyataan yang benar tentang tokoh, latar, dan amanat cerita tersebut adalah ...",o:["Tokoh utama dalam cerita adalah Bima dan Adit.","Latar tempat cerita adalah di tepi sungai desa.","Latar waktu cerita adalah malam hari.","Amanat cerita: kita harus menjaga kebersihan lingkungan.","Adit rajin memunguti sampah sejak awal."],a:[0,1,3],ex:"Ceritanya terjadi pagi hingga siang (bukan malam), dan Adit awalnya malas."},
+{n:32,sec:'D',t:'pgk',img:'📖',pick:2,pass:"**Manfaat Membaca Buku**\nMembaca buku memberikan banyak manfaat. Pertama, membaca menambah pengetahuan dan wawasan kita. Kedua, membaca melatih kita berpikir dan berimajinasi. Ketiga, membaca memperkaya kosakata sehingga kita lebih mudah berbicara dan menulis. Agar terbiasa, kita dapat meluangkan waktu 15 menit setiap hari untuk membaca.",q:"Pernyataan yang sesuai dengan isi teks adalah ...",o:["Membaca buku menambah pengetahuan dan wawasan.","Membaca buku membuat kosakata kita berkurang.","Membaca buku dapat memperkaya kosakata.","Membaca buku harus dilakukan dua jam setiap hari.","Membaca buku hanya bermanfaat bagi orang dewasa."],a:[0,2],ex:"Teks menyebut membaca menambah wawasan dan memperkaya kosakata. Waktu yang disarankan 15 menit."},
+{n:33,sec:'D',t:'pgk',img:'♻️',pick:3,pass:"Kiara gemar membuat kerajinan dari barang bekas. Ia mengumpulkan botol plastik dan kardus, lalu mengubahnya menjadi tempat pensil dan hiasan dinding. Kerajinan buatannya sering dibeli oleh tetangga. Hobi ini membuat Kiara lebih kreatif dan peduli lingkungan.",q:"Informasi yang sesuai dengan isi teks adalah ...",o:["Kiara gemar membuat kerajinan dari barang bekas.","Kiara membuat kerajinan dari kain perca.","Kiara membuat tempat pensil dan hiasan dinding.","Kerajinan buatan Kiara tidak pernah dibeli siapa pun.","Hobi tersebut membuat Kiara lebih kreatif dan peduli lingkungan."],a:[0,2,4],ex:"Bahan yang disebut di teks adalah botol plastik dan kardus, dan kerajinannya sering dibeli tetangga."},
+{n:34,sec:'D',t:'pgk',img:'🧑‍🎓',pick:3,pass:"Kamu akan memperkenalkan teman barumu, Rani, kepada kakakmu.",q:"Agar kakakmu dapat membayangkan Rani dengan jelas, informasi yang tepat untuk menggambarkan Rani adalah ...",o:["Rani berambut hitam panjang dan berkulit sawo matang.","Tinggi Rani sebahu saya dan ia memakai kacamata bulat.","Rani memiliki banyak teman di sekolah lamanya.","Rumah Rani berada cukup jauh dari sekolah.","Rani ramah dan selalu tersenyum kepada siapa saja."],a:[0,1,4],ex:"Teks deskripsi tentang orang menggambarkan ciri fisik dan sifatnya. Jumlah teman dan jarak rumah tidak menggambarkan Rani."},
+{n:35,sec:'D',t:'pgk',img:'🏭',pick:3,q:"Pernyataan yang menunjukkan tahapan yang tepat dalam proses pembuatan buku hingga siap diterbitkan adalah ...",o:["Penulis menyelesaikan naskah, lalu editor menyunting naskah tersebut.","Buku dicetak terlebih dahulu sebelum naskah diperiksa oleh editor.","Setelah naskah disunting, penata letak menata tampilan halaman dan sampul buku.","Buku langsung dijual ke pembaca tanpa melalui proses pencetakan.","Setelah buku dicetak, buku didistribusikan ke toko buku dan perpustakaan."],a:[0,2,4],ex:"Urutannya: naskah selesai, disunting, ditata, dicetak, lalu didistribusikan."},
+
+{n:36,sec:'E',t:'isi',img:'🔠',q:"Puisi yang huruf awal setiap barisnya membentuk sebuah kata secara vertikal disebut puisi ……………………",f:[{ans:['akrostik','puisi akrostik']}],ex:"Puisi akrostik: huruf pertama tiap baris dibaca ke bawah membentuk kata."},
+{n:37,sec:'E',t:'isi',img:'🕊️',q:"Sifat seseorang yang selalu berkata sesuai kenyataan dan tidak berbohong disebut ……………………",f:[{ans:['jujur']}],ex:"Orang yang berkata sesuai kenyataan itu jujur."},
+{n:38,sec:'E',t:'isi',img:'🧠',q:"Persamaan makna (sinonim) kata “pandai” adalah ……………………",f:[{ans:['pintar','cerdas','cakap']}],ex:"Pandai bersinonim dengan pintar dan cerdas."},
+{n:39,sec:'E',t:'isi',img:'↔️',q:"Lawan kata (antonim) dari kata “rajin” adalah ……………………",f:[{ans:['malas']}],ex:"Lawan kata rajin adalah malas."},
+{n:40,sec:'E',t:'isi',img:'🗺️',q:"Unsur intrinsik cerita yang menjelaskan tempat, waktu, dan suasana terjadinya peristiwa disebut ……………………",f:[{ans:['latar','setting','latar cerita']}],ex:"Tempat, waktu, dan suasana peristiwa disebut latar."},
+{n:41,sec:'E',t:'isi',img:'🧐',q:"Orang yang bertugas memperbaiki kesalahan bahasa dan penulisan naskah sebelum buku diterbitkan disebut ……………………",f:[{ans:['editor','penyunting','seorang editor']}],ex:"Editor atau penyunting memperbaiki bahasa dan tulisan naskah."},
+{n:42,sec:'E',t:'isi',img:'💓',pass:"Mendengar kabar itu, jantungku serasa mau copot.",q:"Majas yang digunakan dalam kalimat tersebut adalah majas ……………………",f:[{ans:['hiperbola']}],ex:"Kalimatnya melebih-lebihkan keadaan, itulah majas hiperbola."},
+{n:43,sec:'E',t:'isi',img:'🧺',q:"Kata dasar dari kata “mengumpulkan” adalah ……………………",f:[{ans:['kumpul']}],ex:"Mengumpulkan = meng- + kumpul + -kan. Kata dasarnya kumpul."},
+{n:44,sec:'E',t:'isi',img:'💃',pass:"Dina menari setiap sore karena ia sangat menyukainya.",q:"Hobi adalah kegiatan yang dilakukan seseorang pada waktu (1) …………………… dengan perasaan (2) ……………………",f:[{label:'Isian 1 (waktu ...)',ans:['luang','senggang']},{label:'Isian 2 (perasaan ...)',ans:['senang','gembira','suka','bahagia']}],ex:"Hobi dilakukan pada waktu luang dengan perasaan senang."},
+{n:45,sec:'E',t:'isi',img:'📃',q:"Teks yang berisi petunjuk atau langkah-langkah untuk melakukan sesuatu disebut teks ……………………",f:[{ans:['prosedur','teks prosedur']}],ex:"Petunjuk langkah demi langkah ada pada teks prosedur."},
+
+{n:46,sec:'F',t:'ura',img:'🙋',q:"Bu Guru memintamu memperkenalkan diri di depan kelas. Tuliskan minimal lima informasi tentang identitas dan keunikan dirimu dalam kalimat yang runtut!",model:"Halo, teman-teman! Namaku Aisyah Putri. Umurku 11 tahun dan aku tinggal tidak jauh dari sekolah. Hobiku membaca buku cerita. Cita-citaku menjadi dokter. Keunikanku, aku bisa menirukan suara kucing.",rub:["Ada minimal 5 informasi diri (nama, umur atau tempat tinggal, hobi, cita-cita, keunikan)","Kalimatnya runtut dan utuh","Bahasanya santun dan ejaannya baik"],ex:"Perkenalan diri yang baik berisi identitas dan hal unik tentang dirimu."},
+{n:47,sec:'F',t:'ura',img:'🐷',pass:"**Celengan Rudi**\nRudi ingin membeli sepeda baru. Setiap hari ia menyisihkan sebagian uang sakunya ke dalam celengan. Teman-temannya sering mengajaknya jajan, tetapi Rudi menolak. “Aku sedang menabung,” katanya. Enam bulan kemudian, tabungan Rudi cukup. Ia membeli sepeda baru dengan uangnya sendiri dan merasa sangat bangga.",q:"Tentukan tema dan amanat cerita tersebut, lalu jelaskan alasanmu berdasarkan isi cerita!",model:"Tema: menabung atau berusaha mencapai keinginan. Amanat: kita harus rajin menabung dan sabar agar keinginan tercapai. Alasan: Rudi menyisihkan uang saku setiap hari, menolak ajakan jajan, lalu berhasil membeli sepeda baru.",rub:["Tema: menabung atau berusaha mencapai keinginan","Amanat: rajin menabung dan sabar demi mencapai keinginan","Alasan sesuai isi cerita (menyisihkan uang saku, menolak jajan, berhasil membeli sepeda)"],ex:"Tema adalah pokok cerita, sedangkan amanat adalah pesan untuk pembaca."},
+{n:48,sec:'F',t:'ura',img:'🎸',pass:"Sejak kelas tiga, Farel suka bermain gitar. Awalnya jari-jarinya terasa sakit dan nada yang ia mainkan sering sumbang. Farel hampir menyerah, tetapi kakaknya menyemangatinya. Farel pun berlatih 20 menit setiap hari. Kini ia mampu memainkan beberapa lagu dan tampil di acara sekolah.",q:"Jawablah berdasarkan teks: (a) Apa hobi Farel? (b) Kesulitan apa yang dialami Farel? (c) Pelajaran apa yang dapat kamu ambil dari pengalaman Farel?",model:"a. Hobi Farel adalah bermain gitar. b. Jarinya terasa sakit, nadanya sering sumbang, dan ia hampir menyerah. c. Kita harus tekun berlatih dan tidak mudah menyerah agar kemampuan kita berkembang.",rub:["a. Hobi: bermain gitar","b. Kesulitan: jari sakit, nada sumbang, hampir menyerah (minimal dua)","c. Pelajaran: tekun berlatih dan tidak mudah menyerah"],ex:"Hobi yang ditekuni dengan latihan rutin akan berkembang."},
+{n:49,sec:'F',t:'ura',img:'👩‍🏫',pass:"Bu Siti, guru kelas V, selalu datang ke sekolah lebih pagi dari murid-muridnya. Ia mengajar dengan sabar dan mengulang penjelasan jika ada murid yang belum paham. Ia juga meluangkan waktu membantu murid yang kesulitan belajar.",q:"Tuliskan tiga kata sifat yang sesuai untuk menggambarkan Bu Siti, beserta alasan untuk setiap kata sifat tersebut!",model:"1. Disiplin, karena Bu Siti selalu datang lebih pagi dari murid-muridnya. 2. Sabar, karena ia mengulang penjelasan jika ada murid yang belum paham. 3. Peduli, karena ia meluangkan waktu membantu murid yang kesulitan belajar.",rub:["Tiga kata sifat yang sesuai (misalnya disiplin, sabar, peduli)","Setiap kata sifat punya alasan yang tepat","Kalimat jelas dan ejaan baik"],ex:"Kata sifat menggambarkan watak seseorang, dan alasannya diambil dari tindakannya."},
+{n:50,sec:'F',t:'ura',img:'📕',q:"Jelaskan tahapan proses pembuatan buku mulai dari naskah selesai ditulis hingga buku siap diterbitkan! (minimal empat tahapan secara berurutan)",model:"Pertama, penulis menyelesaikan naskah. Kedua, editor menyunting naskah dan memperbaiki kesalahan bahasa. Ketiga, penata letak menata halaman dan mendesain sampul. Keempat, hasil tata letak diperiksa kembali sebelum cetak. Kelima, buku dicetak dan siap diterbitkan.",rub:["Penyuntingan naskah oleh editor","Penataan letak dan desain sampul","Pemeriksaan hasil sebelum cetak","Pencetakan buku","Urutan runtut dan penjelasan jelas"],ex:"Buku dibuat bertahap supaya isinya benar dan tampilannya menarik."}
+];
+
+var PRAISE=['Hebat, {n}! Jawabanmu benar!','Luar biasa! Kamu pintar sekali, {n}!','Keren! Pertahankan ya, {n}!','Mantap! Kamu memang juara!','Wah, tepat sekali! Bubo bangga padamu!','Yeay! Jawabanmu betul, {n}!'];
+var MOTIV=['Tidak apa-apa, {n}. Ayo coba lagi di soal berikutnya!','Semangat, {n}! Salah itu tempat kita belajar.','Jangan menyerah ya, kamu pasti bisa!','Hampir benar! Terus berlatih, ya.','Kamu hebat karena mau mencoba. Ayo lanjut!','Bubo percaya padamu, {n}. Satu soal lagi!'];
+
+var S={name:'Teman',i:-1,pts:0,rec:[],sound:true,locked:false};
+var main=$('#main');
+
+/* ---------- suara ---------- */
+var AC=null;
+function ac(){ if(!AC){ try{ AC=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} } if(AC&&AC.state==='suspended'){ try{AC.resume();}catch(e){} } return AC; }
+function tone(f,t0,d,type,vol){
+  var c=ac(); if(!c) return;
+  var o=c.createOscillator(), g=c.createGain(), s=c.currentTime+t0;
+  o.type=type||'sine'; o.frequency.value=f;
+  g.gain.setValueAtTime(0.0001,s); g.gain.exponentialRampToValueAtTime(vol||0.2,s+0.02); g.gain.exponentialRampToValueAtTime(0.0001,s+d);
+  o.connect(g); g.connect(c.destination); o.start(s); o.stop(s+d+0.05);
+}
+function sfx(k){
+  if(!S.sound) return;
+  if(k==='ok'){ [523.25,659.25,783.99,1046.5,1318.5].forEach(function(f,i){tone(f,i*0.09,0.38,'triangle',0.22);}); }
+  else if(k==='no'){ [392,440,523.25].forEach(function(f,i){tone(f,i*0.17,0.5,'sine',0.2);}); }
+  else if(k==='tap'){ tone(700,0,0.08,'sine',0.1); }
+  else if(k==='win'){ [523.25,659.25,783.99,659.25,783.99,1046.5,1318.5].forEach(function(f,i){tone(f,i*0.11,0.4,'triangle',0.22);}); }
+}
+var VOICES=[];
+function loadVoices(){ try{ VOICES=speechSynthesis.getVoices()||[]; }catch(e){} }
+if('speechSynthesis' in window){ loadVoices(); try{ speechSynthesis.onvoiceschanged=loadVoices; }catch(e){} }
+function speak(t){
+  if(!S.sound||!('speechSynthesis' in window)) return;
+  try{
+    speechSynthesis.cancel();
+    var u=new SpeechSynthesisUtterance(t); u.lang='id-ID';
+    var v=VOICES.filter(function(v){return /^id/i.test(v.lang);})[0]; if(v) u.voice=v;
+    u.rate=0.95; u.pitch=1.15; u.volume=1;
+    speechSynthesis.speak(u);
+  }catch(e){}
+}
+function stopSpeak(){ try{ speechSynthesis.cancel(); }catch(e){} }
+
+/* ---------- maskot ---------- */
+var OWL='<svg class="owl" viewBox="0 0 140 150" role="img" aria-label="Bubo si burung hantu"><g class="owl-body">'+
+'<ellipse cx="52" cy="140" rx="13" ry="5" fill="#FF9F1C"/><ellipse cx="88" cy="140" rx="13" ry="5" fill="#FF9F1C"/>'+
+'<path d="M28 72 Q28 24 70 24 Q112 24 112 72 L114 102 Q114 138 70 138 Q26 138 26 102 Z" fill="var(--owl)"/>'+
+'<ellipse cx="70" cy="108" rx="27" ry="26" fill="var(--owl-belly)"/>'+
+'<path d="M55 100 q7 7 14 0 q7 7 14 0 M57 114 q7 7 14 0 q7 7 12 0" stroke="var(--owl)" stroke-width="3" fill="none" stroke-linecap="round" opacity=".55"/>'+
+'<path d="M28 82 Q6 98 26 124 Q36 104 34 86Z" fill="var(--owl-wing)"/>'+
+'<g class="wing-r"><path d="M112 82 Q134 98 114 124 Q104 104 106 86Z" fill="var(--owl-wing)"/></g>'+
+'<circle cx="51" cy="64" r="19" fill="#fff"/><circle cx="89" cy="64" r="19" fill="#fff"/>'+
+'<g class="eyes"><g class="pupil"><circle cx="53" cy="66" r="9" fill="#1F2A44"/><circle cx="56" cy="62" r="3" fill="#fff"/><circle cx="91" cy="66" r="9" fill="#1F2A44"/><circle cx="94" cy="62" r="3" fill="#fff"/></g></g>'+
+'<path class="eye-happy" d="M41 68 Q51 54 61 68" stroke="#1F2A44" stroke-width="5" fill="none" stroke-linecap="round"/><path class="eye-happy" d="M79 68 Q89 54 99 68" stroke="#1F2A44" stroke-width="5" fill="none" stroke-linecap="round"/>'+
+'<path class="brow" d="M40 42 L60 46" stroke="#1F2A44" stroke-width="4" stroke-linecap="round"/><path class="brow" d="M100 42 L80 46" stroke="#1F2A44" stroke-width="4" stroke-linecap="round"/>'+
+'<path d="M63 77 L77 77 L70 90Z" fill="#FF9F1C"/>'+
+'<circle cx="37" cy="82" r="5" fill="#FF8FA3" opacity=".65"/><circle cx="103" cy="82" r="5" fill="#FF8FA3" opacity=".65"/>'+
+'<path d="M32 30 L70 12 L108 30 L70 46Z" fill="#2B3A67"/><path d="M52 38 v12 q18 9 36 0 v-12" fill="#243257"/>'+
+'<path d="M108 30 v20" stroke="#FFC83D" stroke-width="3"/><circle cx="108" cy="52" r="4.5" fill="#FFC83D"/>'+
+'<g class="spark" fill="#FFC83D"><path d="M14 40 l3 7 7 3 -7 3 -3 7 -3 -7 -7 -3 7 -3z"/><path d="M122 18 l2.5 6 6 2.5 -6 2.5 -2.5 6 -2.5 -6 -6 -2.5 6 -2.5z"/></g>'+
+'</g></svg>';
+
+function setMood(m,text){
+  var o=main.querySelector('.owl'); if(o){ o.setAttribute('class','owl '+(m||'')); void o.getBoundingClientRect(); }
+  var b=$('#say'); if(b&&text) b.textContent=text;
+}
+
+/* ---------- confetti ---------- */
+var cv=$('#fx'), cx=cv.getContext('2d'), parts=[], raf=0;
+function sizeCv(){ var r=window.devicePixelRatio||1; cv.width=innerWidth*r; cv.height=innerHeight*r; cx.setTransform(r,0,0,r,0,0); }
+function confetti(n){
+  if(RM) return; sizeCv();
+  var cols=['#FFC83D','#FF6B6B','#1FBF8B','#38BDF8','#8B5CF6','#FF9F1C'];
+  for(var i=0;i<(n||90);i++){
+    parts.push({x:innerWidth/2+(Math.random()-.5)*160,y:innerHeight*0.4,vx:(Math.random()-.5)*13,vy:-3-Math.random()*10,w:5+Math.random()*6,h:8+Math.random()*6,c:cols[i%cols.length],r:Math.random()*6,vr:(Math.random()-.5)*.4,l:0});
+  }
+  if(!raf) raf=requestAnimationFrame(tick);
+}
+function tick(){
+  cx.clearRect(0,0,innerWidth,innerHeight);
+  parts.forEach(function(p){ p.vy+=.28; p.x+=p.vx; p.y+=p.vy; p.r+=p.vr; p.l++; cx.save(); cx.translate(p.x,p.y); cx.rotate(p.r); cx.fillStyle=p.c; cx.globalAlpha=Math.max(0,1-p.l/120); cx.fillRect(-p.w/2,-p.h/2,p.w,p.h); cx.restore(); });
+  parts=parts.filter(function(p){return p.l<120&&p.y<innerHeight+30;});
+  if(parts.length) raf=requestAnimationFrame(tick); else { raf=0; cx.clearRect(0,0,innerWidth,innerHeight); }
+}
+
+/* ---------- header ---------- */
+function secOf(q){ return SECS.filter(function(s){return s.id===q.sec;})[0]; }
+function drawTop(){
+  $('#top').hidden=false;
+  var cur=S.i>=0?Q[S.i].sec:'A';
+  var html=''; var passed=true;
+  SECS.forEach(function(s){
+    var cls=s.id===cur?'cur':(passed&&s.id!==cur?'done':'');
+    if(s.id===cur) passed=false;
+    html+='<span class="isle '+cls+'"><b>'+s.id+'</b>'+esc(s.name)+'</span>';
+  });
+  $('#isles').innerHTML=html;
+  $('#barfill').style.width=(Math.max(0,S.i)/Q.length*100)+'%';
+  $('#scorechip').textContent='⭐ '+Math.round(S.pts);
+}
+function plusPop(txt){
+  var chip=$('#scorechip'); if(!chip||RM) return;
+  var r=chip.getBoundingClientRect(); var el=document.createElement('span');
+  el.className='plus'; el.textContent=txt; el.style.left=(r.left+r.width/2-12)+'px'; el.style.top=(r.bottom+4)+'px'; el.style.position='fixed'; el.style.zIndex=50;
+  document.body.appendChild(el); setTimeout(function(){el.remove();},1000);
+}
+
+/* ---------- layar ---------- */
+function showStart(){
+  $('#top').hidden=true; stopSpeak();
+  main.innerHTML='<section class="hero"><span class="deco d1"></span><span class="deco d2"></span><span class="deco d3"></span>'+
+  '<div class="hero-owl">'+OWL+'</div><div class="hero-text"><p class="eyebrow">Bahasa Indonesia · Kelas V · Semester 1</p>'+
+  '<h1>Petualangan Bahasa bersama <span>Bubo</span></h1>'+
+  '<p>Jelajahi 6 pulau seru dan jawab 50 soal! Kalau jawabanmu benar, Bubo bersorak gembira. Kalau belum tepat, Bubo akan menyemangatimu.</p>'+
+  '<label for="nm">Siapa namamu?</label><input id="nm" maxlength="20" autocomplete="off" placeholder="Tulis namamu di sini"><br>'+
+  '<button class="btn big" id="go">Ayo mulai! 🚀</button>'+
+  '<p class="small">Nyalakan suara perangkatmu supaya Bubo bisa bicara. Kamu bisa mematikannya lewat tombol Suara.</p></div></section>';
+  $('#go').onclick=function(){
+    S.name=($('#nm').value||'').trim()||'Teman'; S.i=-1; S.pts=0; S.rec=[]; S.locked=false;
+    ac(); sfx('tap'); loadVoices();
+    showIntro(0,true);
+  };
+  $('#nm').addEventListener('keydown',function(e){ if(e.key==='Enter') $('#go').click(); });
+  var o=main.querySelector('.owl'); if(o) o.setAttribute('class','owl happy');
+}
+function showIntro(si,first){
+  var s=SECS[si]; S.i=s.from-1; drawTop();
+  var hello=first?('Halo, '+S.name+'! Selamat datang di petualangan bahasa. '):('Hebat, '+S.name+'! Kamu sampai di pulau baru. ');
+  main.innerHTML='<section class="panel"><div class="big">'+s.emoji+'</div><h2>'+esc(s.name)+'</h2>'+
+  '<p>'+esc(first?'Halo, '+S.name+'! ':'')+esc(s.intro)+'</p>'+
+  '<div class="stage" style="grid-template-columns:1fr;justify-items:center;margin:0 0 14px">'+OWL+'</div>'+
+  '<button class="btn" id="start">Ayo berlayar! ⛵</button></section>';
+  var o=main.querySelector('.owl'); if(o) o.setAttribute('class','owl happy hop');
+  setTimeout(function(){ speak(hello+'Ini '+s.name+'. '+s.intro); },300);
+}
+
+function renderQ(){
+  var q=Q[S.i], sec=secOf(q); S.locked=false; drawTop(); stopSpeak();
+  var h='<div class="stage"><aside class="buddy">'+OWL+'<div class="bubble" id="say">'+esc(hintFor(q))+'</div></aside>'+
+  '<article class="card" id="card"><div class="qhead"><span class="chip sec">Soal '+q.n+' dari '+Q.length+'</span><span class="chip">'+esc(sec.type)+'</span><button class="ghost" id="read" title="Bubo membacakan soal">🔊 Dengarkan</button></div>'+
+  (q.pass?'<div class="pass">'+fmt(q.pass)+'</div>':'')+
+  '<div class="qwrap" style="margin-top:14px"><div class="sticker" aria-hidden="true">'+q.img+'</div><h2 class="qtext">'+esc(q.q)+'</h2></div>'+
+  '<div id="answer"></div><div id="fb" aria-live="polite"></div></article></div>';
+  main.innerHTML=h;
+  $('#read').onclick=function(){ sfx('tap'); speak(readText(q)); };
+  var a=$('#answer');
+  if(q.t==='pg') buildChoice(a,q,q.o.map(function(t,i){return {k:L[i],t:t};}),false);
+  else if(q.t==='jod') buildChoice(a,q,TERMS.map(function(t,i){return {k:L[i],t:t};}),true);
+  else if(q.t==='bs') buildBS(a,q);
+  else if(q.t==='pgk') buildPGK(a,q);
+  else if(q.t==='isi') buildIsi(a,q);
+  else buildUra(a,q);
+  var o=main.querySelector('.owl'); if(o) o.setAttribute('class','owl');
+  window.scrollTo({top:0,behavior:RM?'auto':'smooth'});
+}
+function hintFor(q){
+  var m={pg:'Baca pelan-pelan, lalu pilih jawabanmu!',bs:'Benar atau salah ya? Pikirkan dulu!',jod:'Cari istilah yang paling cocok!',pgk:'Pilih '+(q.pick||'')+' jawaban ya!',isi:'Ketik jawabanmu. Boleh minta petunjuk!',ura:'Tulis dengan kalimat lengkap, ya!'};
+  return m[q.t];
+}
+function readText(q){
+  var t=(q.pass?q.pass.replace(/\*\*/g,''):'')+'. '+q.q+'. ';
+  if(q.t==='pg'||q.t==='pgk') t+=q.o.map(function(x,i){return 'Pilihan '+L[i]+'. '+x;}).join('. ');
+  if(q.t==='bs') t+='Benar atau salah?';
+  return t.replace(/…+/g,' titik titik ');
+}
+
+function buildChoice(a,q,items,isJod){
+  a.className=isJod?'grid2':'';
+  a.innerHTML=items.map(function(it,i){return '<button class="opt" data-i="'+i+'"><span class="key">'+it.k+'</span><span class="txt">'+esc(it.t)+'</span></button>';}).join('');
+  a.querySelectorAll('.opt').forEach(function(b){
+    b.onclick=function(){
+      if(S.locked) return; var i=+b.dataset.i, ok=i===q.a;
+      a.querySelectorAll('.opt').forEach(function(x){ x.disabled=true; if(+x.dataset.i===q.a) x.classList.add('correct'); else if(x===b) x.classList.add('wrong'); else x.classList.add('dim'); });
+      done({state:ok?'ok':'no',pts:ok?1:0,max:1,detail:items[q.a].k+'. '+items[q.a].t});
+    };
+  });
+}
+function buildBS(a,q){
+  a.className='two';
+  a.innerHTML='<button class="opt bs" data-v="1">✅ Benar</button><button class="opt bs" data-v="0">❌ Salah</button>';
+  a.querySelectorAll('.opt').forEach(function(b){
+    b.onclick=function(){
+      if(S.locked) return; var v=b.dataset.v==='1', ok=v===q.a;
+      a.querySelectorAll('.opt').forEach(function(x){ x.disabled=true; var xv=x.dataset.v==='1'; if(xv===q.a) x.classList.add('correct'); else if(x===b) x.classList.add('wrong'); else x.classList.add('dim'); });
+      done({state:ok?'ok':'no',pts:ok?1:0,max:1,detail:q.a?'Benar':'Salah'});
+    };
+  });
+}
+function buildPGK(a,q){
+  a.innerHTML=q.o.map(function(t,i){return '<button class="opt" aria-pressed="false" data-i="'+i+'"><span class="key">'+L[i]+'</span><span class="txt">'+esc(t)+'</span></button>';}).join('')+
+  '<div class="row"><button class="btn" id="chk" disabled>Periksa jawabanku ✔️</button><span class="counter" id="cnt">Terpilih 0 dari '+q.pick+'</span></div>';
+  var sel={};
+  function upd(){ var n=Object.keys(sel).length; $('#cnt').textContent='Terpilih '+n+' dari '+q.pick; $('#chk').disabled=n!==q.pick; }
+  a.querySelectorAll('.opt').forEach(function(b){
+    b.onclick=function(){
+      if(S.locked) return; var i=+b.dataset.i; sfx('tap');
+      if(sel[i]){ delete sel[i]; b.setAttribute('aria-pressed','false'); }
+      else if(Object.keys(sel).length<q.pick){ sel[i]=1; b.setAttribute('aria-pressed','true'); }
+      upd();
+    };
+  });
+  $('#chk').onclick=function(){
+    if(S.locked) return; var chosen=Object.keys(sel).map(Number), good=chosen.filter(function(i){return q.a.indexOf(i)>-1;}).length;
+    var full=good===q.a.length&&chosen.length===q.a.length;
+    a.querySelectorAll('.opt').forEach(function(x){ var i=+x.dataset.i; x.disabled=true; x.removeAttribute('aria-pressed'); var isA=q.a.indexOf(i)>-1;
+      if(isA) x.classList.add('correct'); else if(sel[i]) x.classList.add('wrong'); else x.classList.add('dim'); });
+    $('#chk').disabled=true;
+    var wrongPick=chosen.length-good;
+    var st=full?'ok':'no', pts=full?2:(wrongPick===0&&good>0?1:0);
+    done({state:st,pts:pts,max:2,detail:q.a.map(function(i){return L[i]+'. '+q.o[i];}).join(' | ')});
+  };
+}
+function buildIsi(a,q){
+  var h=q.f.map(function(f,i){return '<div class="field">'+(f.label?'<label for="in'+i+'">'+esc(f.label)+'</label>':'<label for="in'+i+'">Jawabanmu</label>')+'<input id="in'+i+'" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Ketik di sini"></div>';}).join('');
+  h+='<div class="hint" id="hint"></div><div class="row"><button class="btn" id="chk">Periksa jawabanku ✔️</button><button class="ghost" id="hb">💡 Minta petunjuk</button></div>';
+  a.innerHTML=h;
+  var first=a.querySelector('input'); if(first&&!RM) setTimeout(function(){try{first.focus({preventScroll:true});}catch(e){}},350);
+  a.querySelectorAll('input').forEach(function(inp){ inp.addEventListener('keydown',function(e){ if(e.key==='Enter') $('#chk').click(); }); });
+  $('#hb').onclick=function(){ sfx('tap'); $('#hint').textContent='💡 '+q.f.map(function(f){var w=f.ans[0]; return 'diawali huruf “'+w[0]+'”, '+w.replace(/ /g,'').length+' huruf';}).join(' · '); };
+  $('#chk').onclick=function(){
+    if(S.locked) return; var inputs=a.querySelectorAll('input'), c=0;
+    q.f.forEach(function(f,i){ var v=norm(inputs[i].value), okf=f.ans.some(function(x){return norm(x)===v;}); inputs[i].disabled=true; inputs[i].style.borderColor=okf?'var(--ok-line)':'var(--no-line)'; if(okf) c++; });
+    var n=q.f.length, per=2/n, pts=c*per, full=c===n;
+    $('#chk').disabled=true; $('#hb').disabled=true;
+    done({state:full?'ok':'no',pts:pts,max:2,detail:q.f.map(function(f){return f.ans[0];}).join(' / ')});
+  };
+}
+function buildUra(a,q){
+  a.innerHTML='<div class="field"><label for="tx">Tulis jawabanmu di sini</label><textarea id="tx" rows="5" placeholder="Ayo tulis dengan kalimat lengkap…"></textarea></div>'+
+  '<div class="row"><button class="btn" id="show" disabled>Lihat contoh jawaban Bubo 👀</button><span class="counter" id="cnt">Tulis dulu jawabanmu ya</span></div><div id="mdl"></div>';
+  var tx=$('#tx');
+  tx.addEventListener('input',function(){ var n=tx.value.trim().length; $('#show').disabled=n<8; $('#cnt').textContent=n<8?'Tulis dulu jawabanmu ya':'Siap dibandingkan!'; });
+  $('#show').onclick=function(){
+    sfx('tap'); tx.disabled=true; $('#show').disabled=true; $('#cnt').textContent='';
+    $('#mdl').innerHTML='<div class="model"><p><b>Contoh jawaban Bubo:</b></p><p>'+esc(q.model)+'</p><p><b>Cek jawabanmu:</b></p><ul>'+q.rub.map(function(r){return '<li>'+esc(r)+'</li>';}).join('')+'</ul></div>'+
+    '<p style="font-weight:800;margin:14px 0 6px">Bagaimana jawabanmu dibandingkan contoh?</p><div class="row"><button class="btn" data-s="8">😄 Sudah sesuai</button><button class="btn alt" data-s="4">🙂 Sebagian sesuai</button><button class="btn alt" data-s="0">🤔 Belum sesuai</button></div>';
+    $('#mdl').querySelectorAll('button[data-s]').forEach(function(b){
+      b.onclick=function(){ if(S.locked) return; var p=+b.dataset.s; $('#mdl').querySelectorAll('button').forEach(function(x){x.disabled=true;});
+        done({state:p===8?'ok':'no',pts:p,max:8,detail:q.model,selfcheck:true}); };
+    });
+    $('#mdl').scrollIntoView({behavior:RM?'auto':'smooth',block:'nearest'});
+  };
+}
+
+function done(r){
+  var q=Q[S.i]; S.locked=true; S.rec[S.i]=r; S.pts+=r.pts;
+  var good=r.state==='ok', part=!good&&r.pts>0;
+  var msg=pick(good?PRAISE:MOTIV).replace(/\{n\}/g,S.name);
+  setMood(good?'happy hop':'cheer wobble', good?'Yeay, benar!':'Ayo semangat!');
+  sfx(good?'ok':'no'); setTimeout(function(){speak(msg);},good?600:700);
+  if(good) confetti(r.max>=8?140:80);
+  if(r.pts>0) plusPop('+'+(Math.round(r.pts*10)/10));
+  $('#scorechip').textContent='⭐ '+Math.round(S.pts);
+  var showCorrect=!good&&!r.selfcheck;
+  var title=good?msg:(part?'Hampir benar! '+msg:msg);
+  var last=S.i===Q.length-1, nextSec=!last&&Q[S.i+1].sec!==q.sec;
+  $('#fb').innerHTML='<div class="fb '+(good?'ok':'no')+'"><div class="em">'+(good?'🎉':'💪')+'</div><div><h3>'+esc(title)+'</h3>'+
+   (showCorrect?'<p><b>Jawaban yang benar:</b> '+esc(r.detail)+'</p>':'')+
+   '<p>💡 '+esc(q.ex)+'</p><button class="btn next" id="next">'+(last?'Lihat hasilku 🏆':(nextSec?'Pulau berikutnya ➜':'Lanjut ➜'))+'</button></div></div>';
+  $('#next').onclick=function(){ sfx('tap'); stopSpeak();
+    if(last) return showResult();
+    if(nextSec){ var si=SECS.map(function(s){return s.id;}).indexOf(Q[S.i+1].sec); return showIntro(si,false); }
+    S.i++; renderQ(); };
+  $('#next').scrollIntoView({behavior:RM?'auto':'smooth',block:'nearest'});
+  try{ $('#next').focus({preventScroll:true}); }catch(e){}
+  $('#barfill').style.width=((S.i+1)/Q.length*100)+'%';
+}
+
+function showResult(){
+  S.i=Q.length-1; drawTop(); $('#barfill').style.width='100%';
+  var nilai=Math.round(S.pts), stars=nilai>=85?3:nilai>=70?2:nilai>=50?1:0;
+  var good=nilai>=70;
+  var title=good?'Hebat sekali, '+S.name+'!':'Terima kasih sudah berjuang, '+S.name+'!';
+  var text=nilai>=85?'Kamu juara petualangan bahasa!':nilai>=70?'Kamu sudah sangat baik. Sedikit lagi sempurna!':nilai>=50?'Kamu sudah bagus. Dengan latihan lagi, nilaimu pasti naik!':'Tidak apa-apa. Setiap petualang pasti pernah tersandung. Yuk coba lagi!';
+  var rows=SECS.map(function(s){
+    var p=0; Q.forEach(function(q,i){ if(q.sec===s.id&&S.rec[i]) p+=S.rec[i].pts; });
+    return '<tr><td>'+s.emoji+' '+esc(s.name)+'</td><td>'+(Math.round(p*10)/10)+' / '+s.max+'</td></tr>';
+  }).join('');
+  var rev=[]; Q.forEach(function(q,i){ var r=S.rec[i]; if(r&&r.state!=='ok'&&!r.selfcheck) rev.push('<div><b>Soal '+q.n+'</b> · '+esc(q.q.length>90?q.q.slice(0,90)+'…':q.q)+'<br>Jawaban benar: '+esc(r.detail)+'</div>'); else if(r&&r.state!=='ok') rev.push('<div><b>Soal '+q.n+'</b> · Bandingkan lagi dengan contoh jawaban Bubo.</div>'); });
+  main.innerHTML='<section class="panel"><div class="stage" style="grid-template-columns:1fr;justify-items:center;margin:0">'+OWL+'</div>'+
+  '<h2>'+esc(title)+'</h2><div class="stars">'+[0,1,2].map(function(i){return '<span class="'+(i<stars?'on':'')+'" style="animation-delay:'+(0.4+i*0.35)+'s">⭐</span>';}).join('')+'</div>'+
+  '<div class="score">'+nilai+'</div><p style="margin-top:6px"><b>Nilai dari 100</b></p><p>'+esc(text)+'</p>'+
+  '<div class="tabwrap"><table class="sumtable">'+rows+'</table></div>'+
+  (rev.length?'<h3 style="text-align:left">Yuk belajar lagi</h3><div class="review">'+rev.join('')+'</div>':'<p><b>Semua jawabanmu tepat. Luar biasa!</b></p>')+
+  '<div class="row" style="justify-content:center"><button class="btn" id="again">Main lagi 🔁</button></div>'+
+  '<p class="note">Nilai uraian berasal dari penilaian dirimu sendiri. Mintalah guru untuk memeriksa jawaban uraianmu.</p></section>';
+  var o=main.querySelector('.owl'); if(o) o.setAttribute('class',good?'owl happy hop':'owl cheer');
+  if(good){ sfx('win'); confetti(180); setTimeout(function(){confetti(120);},700); } else sfx('no');
+  setTimeout(function(){ speak(good?('Selamat '+S.name+'! Kamu hebat sekali. Nilaimu '+nilai+'.'):('Tidak apa-apa '+S.name+'. Nilaimu '+nilai+'. Ayo belajar lagi, kamu pasti bisa!')); },900);
+  $('#again').onclick=function(){ stopSpeak(); showStart(); };
+  window.scrollTo({top:0});
+}
+
+/* Intro: tombol mulai */
+main.addEventListener('click',function(e){
+  if(e.target&&e.target.id==='start'){ sfx('tap'); stopSpeak(); renderQ(); }
+});
+
+/* tombol suara */
+$('#snd').onclick=function(){
+  S.sound=!S.sound; this.setAttribute('aria-pressed',S.sound); this.textContent=S.sound?'🔊 Suara':'🔇 Senyap';
+  if(!S.sound) stopSpeak(); else { ac(); sfx('tap'); }
+};
+window.addEventListener('resize',function(){ if(parts.length) sizeCv(); });
+
+showStart();
+})();
+</script>
+
+</body></html>
